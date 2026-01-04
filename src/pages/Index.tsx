@@ -6,6 +6,7 @@ import { Features } from "@/components/Features";
 import { EligibilityChecker } from "@/components/EligibilityChecker";
 import { SchemeResults } from "@/components/SchemeResults";
 import { Footer } from "@/components/Footer";
+import { Chatbot } from "@/components/Chatbot";
 import { Scheme, UserProfile } from "@/lib/schemes";
 
 type View = "home" | "checker" | "results";
@@ -68,6 +69,7 @@ function IndexContent() {
       </main>
       
       <Footer />
+      <Chatbot />
     </div>
   );
 }
