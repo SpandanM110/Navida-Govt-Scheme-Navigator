@@ -1,13 +1,82 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { LanguageProvider } from "@/context/LanguageContext";
+import { Header } from "@/components/Header";
+import { Hero } from "@/components/Hero";
+import { Features } from "@/components/Features";
+import { EligibilityChecker } from "@/components/EligibilityChecker";
+import { SchemeResults } from "@/components/SchemeResults";
+import { Footer } from "@/components/Footer";
+import { Scheme, UserProfile } from "@/lib/schemes";
+
+type View = "home" | "checker" | "results";
+
+function IndexContent() {
+  const [view, setView] = useState<View>("home");
+  const [results, setResults] = useState<Scheme[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  const handleStartCheck = () => {
+    setView("checker");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleResults = (schemes: Scheme[], profile: UserProfile) => {
+    setResults(schemes);
+    setUserProfile(profile);
+    setView("results");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleStartOver = () => {
+    setResults([]);
+    setUserProfile(null);
+    setView("home");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleBackToHome = () => {
+    setView("home");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <main className="flex-1">
+        {view === "home" && (
+          <>
+            <Hero onStartCheck={handleStartCheck} />
+            <Features />
+          </>
+        )}
+        
+        {view === "checker" && (
+          <EligibilityChecker 
+            onResults={handleResults} 
+            onBack={handleBackToHome}
+          />
+        )}
+        
+        {view === "results" && userProfile && (
+          <SchemeResults 
+            schemes={results} 
+            profile={userProfile}
+            onStartOver={handleStartOver}
+          />
+        )}
+      </main>
+      
+      <Footer />
+    </div>
+  );
+}
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <LanguageProvider>
+      <IndexContent />
+    </LanguageProvider>
   );
 };
 
