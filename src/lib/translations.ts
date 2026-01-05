@@ -5,6 +5,11 @@ export const translations = {
     // Navigation & Brand
     brand: "Navida",
     tagline: "Your Guide to Government Welfare",
+    navHome: "Home",
+    navSchemes: "Schemes",
+    navAbout: "About",
+    navFaq: "FAQ",
+    navContact: "Contact",
     
     // Hero Section
     heroTitle: "Discover Government Schemes",
@@ -68,6 +73,11 @@ export const translations = {
     // Navigation & Brand
     brand: "नविदा",
     tagline: "सरकारी कल्याण के लिए आपका मार्गदर्शक",
+    navHome: "होम",
+    navSchemes: "योजनाएं",
+    navAbout: "हमारे बारे में",
+    navFaq: "सामान्य प्रश्न",
+    navContact: "संपर्क",
     
     // Hero Section
     heroTitle: "सरकारी योजनाएं खोजें",
