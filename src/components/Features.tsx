@@ -1,5 +1,41 @@
+"use client";
+
 import { useLanguage } from "@/context/LanguageContext";
 import { Search, FileText, Globe, RefreshCw } from "lucide-react";
+import { motion } from "framer-motion";
+import { SpotlightCard } from "@/components/ui/spotlight";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const iconVariants = {
+  rest: { scale: 1, rotate: 0 },
+  hover: { 
+    scale: 1.1, 
+    rotate: 5,
+    transition: { duration: 0.3, ease: "easeOut" }
+  },
+};
 
 export function Features() {
   const { t } = useLanguage();
@@ -28,32 +64,65 @@ export function Features() {
   ];
 
   return (
-    <section className="py-20 bg-background">
-      <div className="container">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-serif font-bold text-foreground sm:text-4xl">
-            {t("featuresTitle")}
-          </h2>
-        </div>
+    <section className="py-20 bg-background relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      </div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="container relative z-10">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.h2
+            className="text-3xl font-serif font-bold text-foreground sm:text-4xl"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            {t("featuresTitle")}
+          </motion.h2>
+        </motion.div>
+
+        <motion.div
+          className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
           {features.map((feature, index) => (
-            <div
+            <motion.div
               key={index}
-              className="group relative p-6 bg-card rounded-xl border border-border hover:border-accent/50 transition-all duration-300 hover:shadow-elegant"
+              variants={cardVariants}
+              whileHover={{ y: -8 }}
+              transition={{ duration: 0.3 }}
             >
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
-                <feature.icon className="h-6 w-6" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-card-foreground">
-                {feature.title}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {feature.description}
-              </p>
-            </div>
+              <SpotlightCard className="h-full">
+                <motion.div
+                  className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 text-accent"
+                  initial="rest"
+                  whileHover="hover"
+                  variants={iconVariants}
+                >
+                  <feature.icon className="h-6 w-6" />
+                </motion.div>
+                <h3 className="mb-2 text-lg font-semibold text-card-foreground">
+                  {feature.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {feature.description}
+                </p>
+              </SpotlightCard>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
