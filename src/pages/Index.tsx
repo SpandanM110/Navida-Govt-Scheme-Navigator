@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { LanguageProvider } from "@/context/LanguageContext";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
@@ -11,7 +10,7 @@ import { Scheme, UserProfile } from "@/lib/schemes";
 
 type View = "home" | "checker" | "results";
 
-function IndexContent() {
+const Index = () => {
   const [view, setView] = useState<View>("home");
   const [results, setResults] = useState<Scheme[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -71,14 +70,6 @@ function IndexContent() {
       <Footer />
       <Chatbot />
     </div>
-  );
-}
-
-const Index = () => {
-  return (
-    <LanguageProvider>
-      <IndexContent />
-    </LanguageProvider>
   );
 };
 
