@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
+import { AboutSection } from "@/components/AboutSection";
+import { SchemesSection } from "@/components/SchemesSection";
+import { FAQSection } from "@/components/FAQSection";
+import { ContactSection } from "@/components/ContactSection";
 import { EligibilityChecker } from "@/components/EligibilityChecker";
 import { SchemeResults } from "@/components/SchemeResults";
 import { Footer } from "@/components/Footer";
@@ -48,6 +52,10 @@ const Index = () => {
           <>
             <Hero onStartCheck={handleStartCheck} />
             <Features />
+            <AboutSection />
+            <SchemesSection />
+            <FAQSection />
+            <ContactSection />
           </>
         )}
         
