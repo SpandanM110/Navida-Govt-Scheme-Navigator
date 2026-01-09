@@ -169,7 +169,7 @@ export function Hero({ onStartCheck }: HeroProps) {
 
               <MovingBorderButton
                 borderRadius="0.75rem"
-                className="bg-accent/10 text-accent-foreground border-accent/30 hover:bg-accent/20 hover:border-accent/50 transition-all duration-300 flex items-center justify-center text-center"
+                className="bg-accent/10 text-accent-foreground border-accent/30 hover:bg-accent/20 hover:border-accent/50 transition-all duration-300"
                 containerClassName="bg-transparent"
                 borderClassName="bg-[radial-gradient(hsl(var(--accent))_40%,transparent_60%)]"
               >
