@@ -157,7 +157,7 @@ export function Hero({ onStartCheck }: HeroProps) {
             </motion.p>
 
             <motion.div
-              className="flex flex-col sm:flex-row gap-4"
+              className="flex flex-col sm:flex-row gap-4 items-center sm:items-start"
               variants={itemVariants}
             >
               <GlowEffect>
@@ -167,15 +167,18 @@ export function Hero({ onStartCheck }: HeroProps) {
                 </ShimmerButton>
               </GlowEffect>
 
-              <MovingBorderButton
-                borderRadius="0.75rem"
-                className="bg-accent/10 text-accent-foreground border-accent/30 hover:bg-accent/20 hover:border-accent/50 transition-all duration-300"
-                containerClassName="bg-transparent"
-                borderClassName="bg-[radial-gradient(hsl(var(--accent))_40%,transparent_60%)]"
-              >
-                <Play className="h-5 w-5 mr-2 text-accent" />
-                <span className="text-foreground font-medium">{t("learnMore")}</span>
-              </MovingBorderButton>
+              <div className="flex flex-col items-center">
+                <MovingBorderButton
+                  borderRadius="0.75rem"
+                  className="bg-accent/10 text-accent-foreground border-accent/30 hover:bg-accent/20 hover:border-accent/50 transition-all duration-300"
+                  containerClassName="bg-transparent"
+                  borderClassName="bg-[radial-gradient(hsl(var(--accent))_40%,transparent_60%)]"
+                >
+                  <Play className="h-5 w-5 mr-2 text-accent" />
+                  <span className="text-foreground font-medium">{t("learnMore")}</span>
+                </MovingBorderButton>
+                <span className="mt-2 text-sm text-muted-foreground text-center">Watch how it works</span>
+              </div>
             </motion.div>
 
             {/* Stats */}
