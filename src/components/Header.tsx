@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
 import navidaLogo from "@/assets/navida-logo.png";
@@ -15,18 +15,47 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-const navLinks = [
+interface NavLink {
+  href: string;
+  label: string;
+  labelHi: string;
+  sectionId?: string; // For smooth scrolling on home page
+}
+
+const navLinks: NavLink[] = [
   { href: "/", label: "Home", labelHi: "होम" },
-  { href: "/schemes", label: "Schemes", labelHi: "योजनाएं" },
-  { href: "/about", label: "About", labelHi: "हमारे बारे में" },
-  { href: "/faq", label: "FAQ", labelHi: "सामान्य प्रश्न" },
-  { href: "/contact", label: "Contact", labelHi: "संपर्क" },
+  { href: "/schemes", label: "Schemes", labelHi: "योजनाएं", sectionId: "schemes" },
+  { href: "/about", label: "About", labelHi: "हमारे बारे में", sectionId: "about" },
+  { href: "/faq", label: "FAQ", labelHi: "सामान्य प्रश्न", sectionId: "faq" },
+  { href: "/contact", label: "Contact", labelHi: "संपर्क", sectionId: "contact" },
 ];
 
 export function Header() {
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleNavClick = (link: NavLink, e: React.MouseEvent) => {
+    // If we're on the home page and the link has a section ID, smooth scroll
+    if (location.pathname === "/" && link.sectionId) {
+      e.preventDefault();
+      const element = document.getElementById(link.sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } else if (link.sectionId && location.pathname !== "/") {
+      // If not on home page but link has section, navigate to home then scroll
+      e.preventDefault();
+      navigate("/");
+      setTimeout(() => {
+        const element = document.getElementById(link.sectionId!);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
+  };
 
   return (
     <motion.header
@@ -66,7 +95,11 @@ export function Header() {
           {navLinks.map((link) => {
             const isActive = location.pathname === link.href;
             return (
-              <Link key={link.href} to={link.href}>
+              <Link 
+                key={link.href} 
+                to={link.href}
+                onClick={(e) => handleNavClick(link, e)}
+              >
                 <motion.div
                   className={cn(
                     "px-4 py-2 rounded-lg text-sm font-medium transition-colors relative",
@@ -153,7 +186,10 @@ export function Header() {
                   >
                     <Link
                       to={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
+                      onClick={(e) => {
+                        handleNavClick(link, e);
+                        setMobileMenuOpen(false);
+                      }}
                       className={cn(
                         "block px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                         isActive
