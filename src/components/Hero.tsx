@@ -169,10 +169,12 @@ export function Hero({ onStartCheck }: HeroProps) {
 
               <MovingBorderButton
                 borderRadius="0.75rem"
-                className="hover:bg-accent/10"
+                className="bg-accent/10 text-accent-foreground border-accent/30 hover:bg-accent/20 hover:border-accent/50 transition-all duration-300"
+                containerClassName="bg-transparent"
+                borderClassName="bg-[radial-gradient(hsl(var(--accent))_40%,transparent_60%)]"
               >
-                <Play className="h-5 w-5 mr-2" />
-                {t("learnMore")}
+                <Play className="h-5 w-5 mr-2 text-accent" />
+                <span className="text-foreground font-medium">{t("learnMore")}</span>
               </MovingBorderButton>
             </motion.div>
 
