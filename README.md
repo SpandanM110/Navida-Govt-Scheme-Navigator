@@ -1,73 +1,166 @@
-# Welcome to your Lovable project
+# 🧭 Navida – Government Scheme Navigator
 
-## Project info
+Navida is an **AI-powered platform** designed to help Indian citizens **discover, understand, and access government welfare schemes** without confusion, language barriers, or dependency on intermediaries.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+The system combines a **modern React frontend**, a **deterministic eligibility engine**, and **open-source LLMs** to deliver accurate, explainable, and accessible guidance.
 
-## How can I edit this code?
+## 🎯 Problem Statement
 
-There are several ways of editing your application.
+Millions of eligible citizens miss out on government benefits due to:
+- Complex eligibility criteria written in bureaucratic language
+- Low awareness of available schemes
+- Language barriers across diverse populations
+- Dependence on intermediaries or agents
 
-**Use Lovable**
+Navida addresses this by providing **direct, transparent, and multilingual access** to welfare information.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 🏗️ System Architecture (High-Level)
 
-Changes made via Lovable will be committed automatically to this repo.
+Navida follows a **layered, hybrid architecture**:
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
 ```
 
-**Edit a file directly in GitHub**
+User
+↓
+React Frontend (Vite + TypeScript + Tailwind + shadcn/ui)
+↓
+Eligibility Logic (Python – deterministic rules engine)
+↓
+AI Layer (Open-source LLMs for explanation & translation)
+↓
+Supabase (data, auth, future persistence)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
 
-**Use GitHub Codespaces**
+## 🧩 Why Two Frontends? (Important Design Choice)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Navida intentionally separates **AI logic prototyping** from **production UI**.
 
-## What technologies are used for this project?
+### 🔹 React Frontend (Production Layer)
+- Built with **Vite + React + TypeScript**
+- Styled using **Tailwind CSS & shadcn/ui**
+- Deployed on **Vercel**
+- Designed for scalability, accessibility, and real-world usage
 
-This project is built with:
+### 🔹 Streamlit App (AI & Logic Prototype Layer)
+- Used for **rapid development and validation** of:
+  - Eligibility rules
+  - LLM-based explanations
+  - Multilingual support
+- Acts as an **internal AI interaction layer**
+- Enables fast iteration before backend/API integration
 
-- Vite
-- TypeScript
+> Streamlit is **not** the end-user product — it is a **research & validation layer** that ensures correctness and responsible AI usage.
+
+## 📁 Repository Structure
+
+```
+
+navida-accessible-benefits-navigator/
+│
+├── frontend/                    # React + TypeScript application
+│   ├── src/
+│   ├── index.html
+│   └── vite.config.ts
+│
+├── ai_logic_layer/              # Streamlit AI prototype
+│   ├── app.py
+│   ├── eligibility_engine.py
+│   ├── schemes_data.py
+│   ├── llm_utils.py
+│   └── requirements.txt
+│
+├── README.md
+└── .env.example
+
+````
+
+## 🧠 Eligibility & AI Design Principles
+
+### ✅ Deterministic Eligibility
+- All eligibility decisions are **rule-based**
+- No LLM involvement in qualification logic
+- Fully transparent and auditable
+
+### 🤖 Responsible Use of Open LLMs
+Open-source LLMs (e.g., Gemma, Qwen) are used **only for**:
+- Simplifying scheme explanations
+- Translating content into Indian languages
+- Conversational guidance
+
+This avoids hallucinations and ensures trust.
+
+## ⚙️ Tech Stack
+
+### Frontend
 - React
-- shadcn-ui
+- TypeScript
+- Vite
 - Tailwind CSS
+- shadcn/ui
 
-## How can I deploy this project?
+### AI & Logic Layer
+- Python
+- Streamlit
+- Rule-based eligibility engine
+- Open-source LLMs (optional/pluggable)
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Backend / Platform
+- Supabase (auth, database, future storage)
+- Environment-based configuration
 
-## Can I connect a custom domain to my Lovable project?
+## 🚀 Getting Started
 
-Yes, you can!
+### Frontend (React)
+```bash
+cd frontend
+npm install
+npm run dev
+````
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### AI Logic Layer (Streamlit)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```bash
+cd ai_logic_layer
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+## 🧪 How Navida Works (End-to-End)
+
+1. User enters personal details via the React UI
+2. Eligibility rules are evaluated deterministically
+3. Matching schemes are identified
+4. Open LLMs generate:
+
+   * Simple explanations
+   * Multilingual guidance
+5. Results are displayed clearly — no middlemen, no ambiguity
+
+## 📈 Expected Impact
+
+* ⚡ Reduce scheme discovery time from days to minutes
+* 📢 Increase awareness of welfare programs
+* ❌ Eliminate dependency on intermediaries
+* 🌍 Enable inclusive access across languages and regions
+
+## 🔮 Future Roadmap
+
+* Convert eligithe bility engine into FastAPI microservices
+* RAG-based retrieval from official government PDFs
+* Direct application submission & document uploads
+* Life-event-based eligibility notifications
+* Expansion to state-level schemes and languages
+
+## 🎤 One-Line Summary
+
+> Navida combines deterministic eligibility logic with open-source LLM-powered accessibility, using Streamlit for AI prototyping and React for scalable public deployment.
+
+## 📜 License
+
+Developed for educational, research, and public-good use.
+
+## 🙌 Vision
+
+The goal isn’t just better technology —
+it’s **better governance and equitable access to opportunity**.
