@@ -55,25 +55,32 @@ Navida intentionally separates **AI logic prototyping** from **production UI**.
 ## 📁 Repository Structure
 
 ```
-
-navida-accessible-benefits-navigator/
+Navida-Govt-Scheme-Navigator/
 │
-├── frontend/                    # React + TypeScript application
-│   ├── src/
-│   ├── index.html
-│   └── vite.config.ts
+├── src/                         # React + TypeScript application (Vite)
+│   ├── components/
+│   ├── pages/
+│   ├── lib/
+│   └── ...
 │
-├── ai_logic_layer/              # Streamlit AI prototype
-│   ├── app.py
-│   ├── eligibility_engine.py
-│   ├── schemes_data.py
-│   ├── llm_utils.py
+├── streamlit-app/               # Streamlit AI prototype (uses venv)
+│   ├── app.py                   # Streamlit UI
+│   ├── run.bat / run.ps1        # Run scripts (Windows)
+│   ├── run.sh                   # Run script (Mac/Linux)
+│   ├── .env.example             # EXA_API_KEY, GROQ_API_KEY
+│   ├── navida/                  # Core business logic package
+│   │   ├── __init__.py
+│   │   ├── schemes_data.py      # Scheme registry
+│   │   ├── eligibility_engine.py
+│   │   ├── exa_search.py        # Exa Web Search integration
+│   │   ├── groq_client.py       # Groq LLM integration
+│   │   └── llm_utils.py         # Orchestrates Exa + Groq
 │   └── requirements.txt
 │
+├── supabase/                    # Backend functions
 ├── README.md
 └── .env.example
-
-````
+```
 
 ## 🧠 Eligibility & AI Design Principles
 
@@ -120,11 +127,35 @@ npm run dev
 
 ### AI Logic Layer (Streamlit)
 
+Uses a **Python virtual environment** (venv) for isolated dependencies.
+
+**Quick start (recommended):**
+```cmd
+cd streamlit-app
+run.bat
+```
+Windows PowerShell: `.\run.ps1` | Mac/Linux: `./run.sh`
+
+The run script creates `.venv`, installs dependencies, and starts Streamlit.
+
+**Manual setup:**
 ```bash
-cd ai_logic_layer
+cd streamlit-app
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1   # Windows PowerShell
+# source .venv/bin/activate     # Mac/Linux
 pip install -r requirements.txt
+# Copy .env.example to .env and add EXA_API_KEY, GROQ_API_KEY
 streamlit run app.py
 ```
+
+See [streamlit-app/README.md](streamlit-app/README.md) for details.
+
+**Flow:** User enters profile → Exa searches web for relevant schemes → Groq generates personalized guidance (no static scheme database)
+
+**Integrations:**
+- **Exa Web Search** – Dynamic search based on user profile (age, income, state, occupation, etc.)
+- **Groq LLM** – Synthesizes search results into clear, actionable guidance
 
 ## 🧪 How Navida Works (End-to-End)
 

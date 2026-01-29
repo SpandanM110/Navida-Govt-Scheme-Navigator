@@ -9,6 +9,11 @@ lerna-debug.log*
 
 node_modules
 dist
+
+# Python virtual environment
+.venv
+venv
+env
 dist-ssr
 *.local
 
