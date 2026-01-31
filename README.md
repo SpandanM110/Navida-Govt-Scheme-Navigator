@@ -22,13 +22,9 @@ Navida follows a **layered, hybrid architecture**:
 
 User
 ↓
-React Frontend (Vite + TypeScript + Tailwind + shadcn/ui)
+Next.js (React + TypeScript + Tailwind + shadcn/ui)
 ↓
-Eligibility Logic (Python – deterministic rules engine)
-↓
-AI Layer (Open-source LLMs for explanation & translation)
-↓
-Supabase (data, auth, future persistence)
+API Routes (/api/scheme-guidance) → Exa Search → Groq (Llama-4-scout-17b-16e-instruct)
 
 ```
 
@@ -36,11 +32,12 @@ Supabase (data, auth, future persistence)
 
 Navida intentionally separates **AI logic prototyping** from **production UI**.
 
-### 🔹 React Frontend (Production Layer)
-- Built with **Vite + React + TypeScript**
+### 🔹 Next.js Frontend (Production Layer)
+- Built with **Next.js 15 + React + TypeScript**
 - Styled using **Tailwind CSS & shadcn/ui**
+- API routes built-in (no separate server)
 - Deployed on **Vercel**
-- Designed for scalability, accessibility, and real-world usage
+- **Exa + Groq flow:** User profile → Exa search → Llama-4-scout-17b-16e-instruct guidance (same as Streamlit)
 
 ### 🔹 Streamlit App (AI & Logic Prototype Layer)
 - Used for **rapid development and validation** of:
@@ -77,7 +74,14 @@ Navida-Govt-Scheme-Navigator/
 │   │   └── llm_utils.py         # Orchestrates Exa + Groq
 │   └── requirements.txt
 │
-├── supabase/                    # Backend functions
+├── app/                         # Next.js App Router
+│   ├── api/scheme-guidance/     # API route (Exa + Groq)
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── about/, schemes/, faq/, contact/
+│   └── globals.css
+├── supabase/                    # Optional (Chatbot)
+│   └── functions/scheme-chat/
 ├── README.md
 └── .env.example
 ```
@@ -118,12 +122,19 @@ This avoids hallucinations and ensures trust.
 
 ## 🚀 Getting Started
 
-### Frontend (React)
+### Frontend (Next.js)
 ```bash
-cd frontend
 npm install
 npm run dev
-````
+```
+
+**Single dev server:** Next.js runs both the frontend and API routes. No separate API server needed.
+
+**Web flow:** User enters profile → Exa search → Llama-4-scout-17b-16e-instruct guidance
+
+**Environment:** Add `EXA_API_KEY` and `GROQ_API_KEY` to `.env.local` (or `.env`).
+
+**Production:** Deploy to Vercel – Next.js API routes at `/api/scheme-guidance` work automatically. Set `EXA_API_KEY` and `GROQ_API_KEY` in Vercel project settings.
 
 ### AI Logic Layer (Streamlit)
 
@@ -159,14 +170,10 @@ See [streamlit-app/README.md](streamlit-app/README.md) for details.
 
 ## 🧪 How Navida Works (End-to-End)
 
-1. User enters personal details via the React UI
-2. Eligibility rules are evaluated deterministically
-3. Matching schemes are identified
-4. Open LLMs generate:
-
-   * Simple explanations
-   * Multilingual guidance
-5. Results are displayed clearly — no middlemen, no ambiguity
+1. User enters personal details (age, income, gender, state, occupation, category)
+2. **Exa** searches the web for relevant Indian government schemes
+3. **Llama-4-scout-17b-16e-instruct** (via Groq) synthesizes search results into personalized guidance
+4. Results displayed with source links — no static scheme database
 
 ## 📈 Expected Impact
 

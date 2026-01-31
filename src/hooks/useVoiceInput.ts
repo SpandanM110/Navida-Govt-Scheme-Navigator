@@ -1,7 +1,16 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 
+const LANGUAGE_CODES: Record<string, string> = {
+  en: "en-IN",
+  hi: "hi-IN",
+  bn: "bn-IN",
+  ta: "ta-IN",
+  te: "te-IN",
+  mr: "mr-IN",
+};
+
 interface UseVoiceInputOptions {
-  language: "en" | "hi";
+  language: string;
   onTranscript?: (transcript: string) => void;
   onError?: (error: string) => void;
 }
@@ -27,8 +36,8 @@ export function useVoiceInput({ language, onTranscript, onError }: UseVoiceInput
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     
-    // Configure for the selected language
-    recognition.lang = language === "hi" ? "hi-IN" : "en-IN";
+    // Configure for the selected language (multilingual support)
+    recognition.lang = LANGUAGE_CODES[language] || "en-IN";
     recognition.continuous = false;
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;

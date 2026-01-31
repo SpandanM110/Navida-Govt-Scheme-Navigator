@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
+import ReactMarkdown from "react-markdown";
 import { MessageCircle, Send, X, Mic, MicOff, Bot, User, Loader2, Sparkles } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useVoiceInput } from "@/hooks/useVoiceInput";
@@ -16,7 +17,9 @@ interface Message {
   content: string;
 }
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/scheme-chat`;
+// Prefer Next.js API (Groq) - works without Supabase
+const CHAT_URL = "/api/scheme-chat";
+const CHATBOT_MESSAGES_KEY = "navida_chatbot_messages";
 
 const chatVariants = {
   hidden: { opacity: 0, scale: 0.8, y: 50 },
@@ -64,7 +67,36 @@ export function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isRestored, setIsRestored] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Restore persisted conversation on mount (memory across navigations)
+  useEffect(() => {
+    if (typeof window === "undefined" || isRestored) return;
+    try {
+      const stored = sessionStorage.getItem(CHATBOT_MESSAGES_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as Message[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMessages(parsed);
+        }
+      }
+    } catch {
+      // Ignore
+    } finally {
+      setIsRestored(true);
+    }
+  }, [isRestored]);
+
+  // Persist messages so conversation continues in flow
+  useEffect(() => {
+    if (typeof window === "undefined" || messages.length === 0) return;
+    try {
+      sessionStorage.setItem(CHATBOT_MESSAGES_KEY, JSON.stringify(messages));
+    } catch {
+      // Ignore
+    }
+  }, [messages]);
 
   const handleTranscript = useCallback((transcript: string) => {
     setInput((prev) => prev + (prev ? " " : "") + transcript);
@@ -91,14 +123,13 @@ export function Chatbot() {
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      const welcomeMessage = language === "hi" 
-        ? "नमस्ते! मैं नविदा हूं। मैं आपको सरकारी योजनाओं के बारे में जानकारी देने में मदद कर सकता हूं। आप मुझसे पूछ सकते हैं जैसे 'क्या मैं किसान योजना के लिए पात्र हूं?' या 'महिलाओं के लिए कौन सी योजनाएं हैं?'"
-        : "Hello! I'm Navida. I can help you find government schemes you may be eligible for. Ask me questions like 'Am I eligible for farmer schemes?' or 'What schemes are there for women?'";
-      
-      setMessages([{ role: "assistant", content: welcomeMessage }]);
-    }
-  }, [isOpen, language, messages.length]);
+    if (!isRestored || !isOpen || messages.length > 0) return;
+    const welcomeMessage = language === "hi" 
+      ? "नमस्ते! मैं नविदा हूं। मैं आपको सरकारी योजनाओं के बारे में जानकारी देने में मदद कर सकता हूं। आप मुझसे पूछ सकते हैं जैसे 'क्या मैं किसान योजना के लिए पात्र हूं?' या 'महिलाओं के लिए कौन सी योजनाएं हैं?'"
+      : "Hello! I'm Navida. I can help you find government schemes you may be eligible for. Ask me questions like 'Am I eligible for farmer schemes?' or 'What schemes are there for women?'";
+    
+    setMessages([{ role: "assistant", content: welcomeMessage }]);
+  }, [isOpen, language, messages.length, isRestored]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -113,10 +144,7 @@ export function Chatbot() {
     try {
       const response = await fetch(CHAT_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [...messages, userMessage],
           language,
@@ -125,6 +153,12 @@ export function Chatbot() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+          throw new Error("Sign in required to chat. Please sign in and try again.");
+        }
+        if (response.status === 429) {
+          throw new Error(errorData.error || "Rate limit exceeded. Try again in 24 hours.");
+        }
         throw new Error(errorData.error || "Failed to get response");
       }
 
@@ -310,10 +344,23 @@ export function Chatbot() {
                           className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
                             message.role === "user"
                               ? "bg-primary text-primary-foreground"
-                              : "bg-muted text-foreground"
+                              : "bg-muted text-foreground prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-strong:text-foreground"
                           }`}
                         >
-                          {message.content}
+                          {message.role === "assistant" ? (
+                            <ReactMarkdown
+                              components={{
+                                p: ({ children }) => <span className="block">{children}</span>,
+                                strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                                ul: ({ children }) => <ul className="list-disc list-inside space-y-0.5">{children}</ul>,
+                                ol: ({ children }) => <ol className="list-decimal list-inside space-y-0.5">{children}</ol>,
+                              }}
+                            >
+                              {message.content}
+                            </ReactMarkdown>
+                          ) : (
+                            message.content
+                          )}
                         </div>
                         {message.role === "user" && (
                           <motion.div

@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Navida Design System - Government Scheme Navigator */
+
+@layer base {
+  :root {
+    /* Core brand colors - Deep Navy & Warm Orange */
+    --background: 210 25% 98%;
+    --foreground: 215 50% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 50% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 50% 15%;
+
+    /* Primary - Deep Navy Blue */
+    --primary: 215 70% 25%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Soft Blue */
+    --secondary: 210 30% 94%;
+    --secondary-foreground: 215 50% 25%;
+
+    /* Muted - Neutral grays */
+    --muted: 210 20% 94%;
+    --muted-foreground: 215 15% 45%;
+
+    /* Accent - Warm Orange (call to action) */
+    --accent: 28 90% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Success - Green for confirmations */
+    --success: 142 70% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 215 70% 25%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(215 70% 25%) 0%, hsl(215 60% 35%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(28 90% 55%) 0%, hsl(35 90% 50%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(210 25% 98%) 0%, hsl(210 20% 95%) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px hsl(215 50% 15% / 0.05);
+    --shadow-md: 0 8px 24px hsl(215 50% 15% / 0.08);
+    --shadow-lg: 0 16px 48px hsl(215 50% 15% / 0.12);
+    --shadow-glow: 0 0 40px hsl(28 90% 55% / 0.3);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 215 50% 25%;
+    --sidebar-primary: 215 70% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 30% 94%;
+    --sidebar-accent-foreground: 215 50% 25%;
+    --sidebar-border: 210 20% 88%;
+    --sidebar-ring: 215 70% 45%;
+  }
+
+  .dark {
+    --background: 215 50% 8%;
+    --foreground: 210 25% 95%;
+
+    --card: 215 45% 12%;
+    --card-foreground: 210 25% 95%;
+
+    --popover: 215 45% 12%;
+    --popover-foreground: 210 25% 95%;
+
+    --primary: 210 60% 70%;
+    --primary-foreground: 215 50% 10%;
+
+    --secondary: 215 35% 18%;
+    --secondary-foreground: 210 25% 90%;
+
+    --muted: 215 30% 18%;
+    --muted-foreground: 210 15% 60%;
+
+    --accent: 28 85% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 142 60% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 30% 20%;
+    --input: 215 30% 20%;
+    --ring: 210 60% 70%;
+
+    --sidebar-background: 215 50% 10%;
+    --sidebar-foreground: 210 25% 90%;
+    --sidebar-primary: 210 60% 70%;
+    --sidebar-primary-foreground: 215 50% 10%;
+    --sidebar-accent: 215 35% 18%;
+    --sidebar-accent-foreground: 210 25% 90%;
+    --sidebar-border: 215 30% 20%;
+    --sidebar-ring: 210 60% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+}
+
+@layer utilities {
+  .text-gradient-accent {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-accent);
+  }
+
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .bg-gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .bg-gradient-subtle {
+    background: var(--gradient-subtle);
+  }
+
+  .shadow-elegant {
+    box-shadow: var(--shadow-md);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 0.5s ease-out forwards;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

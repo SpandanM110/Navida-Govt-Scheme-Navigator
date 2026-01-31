@@ -98,7 +98,7 @@ export function FAQSection() {
     },
   };
 
-  const t = content[language];
+  const t = content[language as keyof typeof content] || content.en;
 
   return (
     <section id="faq" className="py-20 bg-muted/30 relative overflow-hidden">

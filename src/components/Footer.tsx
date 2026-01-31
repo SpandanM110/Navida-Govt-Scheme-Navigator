@@ -2,7 +2,6 @@
 
 import { useLanguage } from "@/context/LanguageContext";
 import { motion } from "framer-motion";
-import navidaLogo from "@/assets/navida-logo.png";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -54,7 +53,7 @@ export function Footer() {
               transition={{ duration: 0.2 }}
             >
               <motion.img
-                src={navidaLogo}
+                src="/images/navida-logo.png"
                 alt="Navida Logo"
                 className="h-10 w-10 rounded-lg bg-primary-foreground/10 p-1"
                 whileHover={{ rotate: 5, scale: 1.05 }}

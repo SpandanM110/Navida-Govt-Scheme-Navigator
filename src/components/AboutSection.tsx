@@ -2,8 +2,9 @@
 
 import { useLanguage } from "@/context/LanguageContext";
 import { motion } from "framer-motion";
-import { Users, Target, Heart, Award } from "lucide-react";
+import { Target, MapPin, Globe, Zap } from "lucide-react";
 import { SpotlightCard } from "@/components/ui/spotlight";
+import { schemes, states } from "@/lib/schemes";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -37,10 +38,10 @@ export function AboutSection() {
       subtitle: "Bridging Citizens & Government Welfare",
       description: "Navida is an AI-powered platform designed to help Indian citizens discover and access government welfare schemes they are eligible for. We believe every citizen deserves to benefit from the programs meant for them.",
       stats: [
-        { icon: Users, value: "10L+", label: "Citizens Helped" },
-        { icon: Target, value: "500+", label: "Schemes Covered" },
-        { icon: Heart, value: "28", label: "States Served" },
-        { icon: Award, value: "99%", label: "Accuracy Rate" },
+        { icon: Target, value: `${schemes.length}+`, label: "Curated Schemes" },
+        { icon: MapPin, value: states.length.toString(), label: "States & UTs" },
+        { icon: Globe, value: "6", label: "Languages" },
+        { icon: Zap, value: "Free", label: "Always Free" },
       ],
       mission: "Our Mission",
       missionText: "To make government welfare accessible to every Indian citizen through technology, breaking barriers of language, literacy, and awareness.",
@@ -52,10 +53,10 @@ export function AboutSection() {
       subtitle: "नागरिकों और सरकारी कल्याण को जोड़ना",
       description: "नविदा एक AI-संचालित प्लेटफॉर्म है जो भारतीय नागरिकों को उन सरकारी कल्याण योजनाओं की खोज और पहुंच में मदद करने के लिए डिज़ाइन किया गया है जिनके लिए वे पात्र हैं। हम मानते हैं कि हर नागरिक को उनके लिए बनाए गए कार्यक्रमों से लाभ उठाने का अधिकार है।",
       stats: [
-        { icon: Users, value: "10L+", label: "नागरिकों की मदद" },
-        { icon: Target, value: "500+", label: "योजनाएं शामिल" },
-        { icon: Heart, value: "28", label: "राज्यों में सेवा" },
-        { icon: Award, value: "99%", label: "सटीकता दर" },
+        { icon: Target, value: `${schemes.length}+`, label: "क्यूरेटेड योजनाएं" },
+        { icon: MapPin, value: states.length.toString(), label: "राज्य और केंद्रशासित" },
+        { icon: Globe, value: "6", label: "भाषाएं" },
+        { icon: Zap, value: "मुफ्त", label: "हमेशा मुफ्त" },
       ],
       mission: "हमारा मिशन",
       missionText: "प्रौद्योगिकी के माध्यम से हर भारतीय नागरिक के लिए सरकारी कल्याण को सुलभ बनाना, भाषा, साक्षरता और जागरूकता की बाधाओं को तोड़ना।",
@@ -64,7 +65,7 @@ export function AboutSection() {
     },
   };
 
-  const t = content[language];
+  const t = content[language as keyof typeof content] || content.en;
 
   return (
     <section id="about" className="py-20 bg-muted/30 relative overflow-hidden">

@@ -1,6 +1,6 @@
 """
 Navida – AI Logic Layer (Streamlit)
-Exa-first flow: User input → Exa search → Llama 3.3 70B guidance.
+Exa-first flow: User input → Exa search → Llama-4-scout-17b-16e-instruct guidance.
 No static schemes_data – dynamic search from the web.
 """
 

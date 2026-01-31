@@ -50,7 +50,7 @@ export function SchemesSection() {
     },
   };
 
-  const t = content[language];
+  const t = content[language as keyof typeof content] || content.en;
 
   // Show first 6 schemes
   const displaySchemes = schemes.slice(0, 6);

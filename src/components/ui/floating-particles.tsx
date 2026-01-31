@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 interface ParticleProps {
   delay: number;
@@ -16,8 +16,8 @@ function Particle({ delay, duration, x, y, size }: ParticleProps) {
     <motion.div
       className="absolute rounded-full bg-accent/30"
       style={{
-        width: size,
-        height: size,
+        width: `${size}px`,
+        height: `${size}px`,
         left: `${x}%`,
         top: `${y}%`,
       }}
@@ -46,7 +46,14 @@ export function FloatingParticles({
   count = 20,
   className,
 }: FloatingParticlesProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const particles = useMemo(() => {
+    if (!mounted) return [];
     return Array.from({ length: count }, (_, i) => ({
       id: i,
       delay: Math.random() * 5,
@@ -55,10 +62,10 @@ export function FloatingParticles({
       y: 50 + Math.random() * 50,
       size: 4 + Math.random() * 8,
     }));
-  }, [count]);
+  }, [count, mounted]);
 
   return (
-    <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
+    <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className ?? ""}`}>
       {particles.map((particle) => (
         <Particle key={particle.id} {...particle} />
       ))}

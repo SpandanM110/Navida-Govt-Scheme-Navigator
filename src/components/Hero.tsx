@@ -1,13 +1,10 @@
 "use client";
 
 import { useLanguage } from "@/context/LanguageContext";
-import { ArrowRight, Play, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { schemes, states } from "@/lib/schemes";
 import { motion } from "framer-motion";
-import heroBg from "@/assets/hero-bg.jpg";
-import heroPeople from "@/assets/hero-people.jpg";
-import { FloatingParticles } from "@/components/ui/floating-particles";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
-import { MovingBorderButton } from "@/components/ui/moving-border";
 import { GlowEffect } from "@/components/ui/glow-effect";
 import { SpotlightCard } from "@/components/ui/spotlight";
 
@@ -85,7 +82,7 @@ export function Hero({ onStartCheck }: HeroProps) {
       {/* HD Background Image with Overlay */}
       <div className="absolute inset-0">
         <img
-          src={heroBg}
+          src="/images/hero-bg.jpg"
           alt=""
           className="w-full h-full object-cover"
           aria-hidden="true"
@@ -109,9 +106,6 @@ export function Hero({ onStartCheck }: HeroProps) {
           }}
         />
       </motion.div>
-
-      {/* Floating Particles */}
-      <FloatingParticles count={25} />
 
       <div className="container relative py-16 md:py-24 lg:py-32 z-10">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
@@ -175,9 +169,9 @@ export function Hero({ onStartCheck }: HeroProps) {
               variants={containerVariants}
             >
               {[
-                { value: "500+", label: "Schemes Listed" },
-                { value: "10L+", label: "Citizens Helped" },
-                { value: "28", label: "States Covered" },
+                { value: `${schemes.length}+`, label: "Schemes" },
+                { value: states.length.toString(), label: "States & UTs" },
+                { value: "6", label: "Languages" },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -209,7 +203,7 @@ export function Hero({ onStartCheck }: HeroProps) {
             <GlowEffect glowColor="hsl(var(--primary))">
               <div className="relative rounded-2xl overflow-hidden shadow-elegant border border-border/50">
                 <motion.img
-                  src={heroPeople}
+                  src="/images/hero-people.jpg"
                   alt="Diverse Indian citizens benefiting from government schemes"
                   className="w-full h-auto object-cover"
                   whileHover={{ scale: 1.02 }}

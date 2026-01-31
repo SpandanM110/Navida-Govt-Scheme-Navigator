@@ -1,10 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
-import navidaLogo from "@/assets/navida-logo.png";
 import { Globe, Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,37 +24,36 @@ import { cn } from "@/lib/utils";
 
 interface NavLink {
   href: string;
-  label: string;
-  labelHi: string;
+  labelKey: string;
   sectionId?: string; // For smooth scrolling on home page
 }
 
 const navLinks: NavLink[] = [
-  { href: "/", label: "Home", labelHi: "होम" },
-  { href: "/schemes", label: "Schemes", labelHi: "योजनाएं", sectionId: "schemes" },
-  { href: "/about", label: "About", labelHi: "हमारे बारे में", sectionId: "about" },
-  { href: "/faq", label: "FAQ", labelHi: "सामान्य प्रश्न", sectionId: "faq" },
-  { href: "/contact", label: "Contact", labelHi: "संपर्क", sectionId: "contact" },
+  { href: "/", labelKey: "navHome" },
+  { href: "/schemes", labelKey: "navSchemes", sectionId: "schemes" },
+  { href: "/about", labelKey: "navAbout", sectionId: "about" },
+  { href: "/faq", labelKey: "navFaq", sectionId: "faq" },
+  { href: "/contact", labelKey: "navContact", sectionId: "contact" },
 ];
 
 export function Header() {
   const { language, setLanguage, t } = useLanguage();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavClick = (link: NavLink, e: React.MouseEvent) => {
     // If we're on the home page and the link has a section ID, smooth scroll
-    if (location.pathname === "/" && link.sectionId) {
+    if (pathname === "/" && link.sectionId) {
       e.preventDefault();
       const element = document.getElementById(link.sectionId);
       if (element) {
         element.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-    } else if (link.sectionId && location.pathname !== "/") {
+    } else if (link.sectionId && pathname !== "/") {
       // If not on home page but link has section, navigate to home then scroll
       e.preventDefault();
-      navigate("/");
+      router.push("/");
       setTimeout(() => {
         const element = document.getElementById(link.sectionId!);
         if (element) {
@@ -66,14 +72,14 @@ export function Header() {
     >
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link to="/">
+        <Link href="/">
           <motion.div
             className="flex items-center gap-3"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
             <motion.img
-              src={navidaLogo}
+              src="/images/navida-logo.png"
               alt="Navida Logo"
               className="h-10 w-10"
               whileHover={{ rotate: 5 }}
@@ -93,11 +99,11 @@ export function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => {
-            const isActive = location.pathname === link.href;
+            const isActive = pathname === link.href;
             return (
               <Link 
                 key={link.href} 
-                to={link.href}
+                href={link.href}
                 onClick={(e) => handleNavClick(link, e)}
               >
                 <motion.div
@@ -110,7 +116,7 @@ export function Header() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {language === "hi" ? link.labelHi : link.label}
+                  {t(link.labelKey)}
                   {isActive && (
                     <motion.div
                       className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-6 bg-primary rounded-full"
@@ -126,14 +132,35 @@ export function Header() {
 
         {/* Right Actions */}
         <div className="flex items-center gap-3">
-          {/* Language Switcher */}
+          {/* Auth */}
+          <SignedOut>
+            <SignInButton mode="modal">
+              <Button variant="ghost" size="sm">
+                {language === "hi" ? "साइन इन" : "Sign In"}
+              </Button>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <Button size="sm" className="bg-primary text-primary-foreground">
+                {language === "hi" ? "साइन अप" : "Sign Up"}
+              </Button>
+            </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          {/* Language Switcher - Multilingual support */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Globe className="h-4 w-4" />
                   <span className="hidden sm:inline">
-                    {language === "en" ? "English" : "हिंदी"}
+                    {language === "en" && "English"}
+                    {language === "hi" && "हिंदी"}
+                    {language === "bn" && "বাংলা"}
+                    {language === "ta" && "தமிழ்"}
+                    {language === "te" && "తెలుగు"}
+                    {language === "mr" && "मराठी"}
                   </span>
                   <ChevronDown className="h-3 w-3" />
                 </Button>
@@ -145,6 +172,18 @@ export function Header() {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setLanguage("hi")}>
                 🇮🇳 हिंदी
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage("bn")}>
+                🇮🇳 বাংলা
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage("ta")}>
+                🇮🇳 தமிழ்
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage("te")}>
+                🇮🇳 తెలుగు
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage("mr")}>
+                🇮🇳 मराठी
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -176,7 +215,7 @@ export function Header() {
           >
             <nav className="container py-4 space-y-1">
               {navLinks.map((link, index) => {
-                const isActive = location.pathname === link.href;
+                const isActive = pathname === link.href;
                 return (
                   <motion.div
                     key={link.href}
@@ -185,7 +224,7 @@ export function Header() {
                     transition={{ delay: index * 0.05 }}
                   >
                     <Link
-                      to={link.href}
+                      href={link.href}
                       onClick={(e) => {
                         handleNavClick(link, e);
                         setMobileMenuOpen(false);
@@ -197,7 +236,7 @@ export function Header() {
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       )}
                     >
-                      {language === "hi" ? link.labelHi : link.label}
+                      {t(link.labelKey)}
                     </Link>
                   </motion.div>
                 );

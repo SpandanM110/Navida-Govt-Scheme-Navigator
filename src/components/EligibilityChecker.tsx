@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,12 +12,59 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { states, occupations, checkEligibility, Scheme, UserProfile } from "@/lib/schemes";
-import { ArrowLeft, ArrowRight, Search } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { states, occupations } from "@/lib/schemes";
+import { fetchSchemeGuidance, type UserProfileForGuidance } from "@/lib/schemeGuidanceApi";
+import { ArrowLeft, ArrowRight, Search, Loader2, Clock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
+function RateLimitCountdown({ resetAt, language }: { resetAt: string; language: string }) {
+  const [remaining, setRemaining] = useState<string | null>(null);
+
+  useEffect(() => {
+    const update = () => {
+      const reset = new Date(resetAt).getTime();
+      const now = Date.now();
+      const diff = Math.max(0, reset - now);
+
+      if (diff <= 0) {
+        setRemaining(null);
+        return;
+      }
+
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+      setRemaining(
+        `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`
+      );
+    };
+
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [resetAt]);
+
+  if (!remaining) return null;
+
+  const label = language === "hi" ? "पुनः प्रयास करने के लिए शेष समय:" : "Time until you can try again:";
+  return (
+    <div className="mt-3 flex items-center gap-2 text-foreground/90">
+      <Clock className="h-4 w-4 flex-shrink-0" />
+      <span>{label}</span>
+      <span className="font-mono font-semibold tabular-nums">{remaining}</span>
+    </div>
+  );
+}
+
+export interface GuidanceResult {
+  guidance: string;
+  urls: string[];
+  modelName?: string;
+}
+
 interface EligibilityCheckerProps {
-  onResults: (schemes: Scheme[], profile: UserProfile) => void;
+  onResults: (guidance: string, urls: string[], profile: UserProfileForGuidance, modelName?: string) => void;
   onBack: () => void;
 }
 
@@ -24,6 +72,9 @@ export function EligibilityChecker({ onResults, onBack }: EligibilityCheckerProp
   const { language, t } = useLanguage();
   const [step, setStep] = useState(1);
   const totalSteps = 3;
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [rateLimitResetAt, setRateLimitResetAt] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     age: "",
@@ -32,6 +83,7 @@ export function EligibilityChecker({ onResults, onBack }: EligibilityCheckerProp
     occupation: "",
     gender: "",
     category: "general",
+    business_owner: false,
   });
 
   const handleNext = () => {
@@ -48,18 +100,32 @@ export function EligibilityChecker({ onResults, onBack }: EligibilityCheckerProp
     }
   };
 
-  const handleSubmit = () => {
-    const profile: UserProfile = {
+  const handleSubmit = async () => {
+    setError(null);
+    setRateLimitResetAt(null);
+    setLoading(true);
+
+    const profile: UserProfileForGuidance = {
       age: parseInt(formData.age) || 0,
       income: parseInt(formData.income) || 0,
       state: formData.state,
       occupation: formData.occupation,
       gender: formData.gender,
       category: formData.category,
+      business_owner: formData.business_owner,
     };
-    
-    const eligibleSchemes = checkEligibility(profile);
-    onResults(eligibleSchemes, profile);
+
+    try {
+      const result = await fetchSchemeGuidance(profile, language);
+      onResults(result.guidance, result.urls, profile, result.modelName);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to fetch guidance. Please try again.";
+      setError(msg);
+      const resetAt = (err as Error & { resetAt?: string })?.resetAt;
+      if (resetAt) setRateLimitResetAt(resetAt);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isStepValid = () => {
@@ -83,6 +149,9 @@ export function EligibilityChecker({ onResults, onBack }: EligibilityCheckerProp
             {t("eligibilityTitle")}
           </h2>
           <p className="text-muted-foreground">{t("eligibilitySubtitle")}</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Exa web search + Llama-4-scout-17b-16e-instruct gives you personalized guidance
+          </p>
         </div>
 
         {/* Progress */}
@@ -188,6 +257,19 @@ export function EligibilityChecker({ onResults, onBack }: EligibilityCheckerProp
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="business_owner"
+                  checked={formData.business_owner}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, business_owner: checked === true })
+                  }
+                />
+                <Label htmlFor="business_owner" className="cursor-pointer">
+                  {t("businessOwner")}
+                </Label>
+              </div>
             </div>
           )}
 
@@ -215,9 +297,21 @@ export function EligibilityChecker({ onResults, onBack }: EligibilityCheckerProp
             </div>
           )}
 
+          {error && (
+            <div className="mt-4 p-4 rounded-lg bg-destructive/10 text-destructive text-sm border border-destructive/20" role="alert">
+              {rateLimitResetAt ? (
+                <RateLimitCountdown resetAt={rateLimitResetAt} language={language} />
+              ) : (
+                <>
+                  <strong>{language === "hi" ? "त्रुटि:" : "Error:"}</strong> {error}
+                </>
+              )}
+            </div>
+          )}
+
           {/* Navigation */}
           <div className="flex justify-between mt-8">
-            <Button variant="outline" onClick={handlePrev} className="gap-2">
+            <Button variant="outline" onClick={handlePrev} className="gap-2" disabled={loading}>
               <ArrowLeft className="h-4 w-4" />
               {t("back")}
             </Button>
@@ -232,14 +326,35 @@ export function EligibilityChecker({ onResults, onBack }: EligibilityCheckerProp
                 <ArrowRight className="h-4 w-4" />
               </Button>
             ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={!isStepValid()}
-                className="gap-2 bg-gradient-accent text-accent-foreground hover:opacity-90"
-              >
-                <Search className="h-4 w-4" />
-                {t("findSchemes")}
-              </Button>
+              <>
+                <SignedIn>
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={!isStepValid() || loading}
+                    className="gap-2 bg-gradient-accent text-accent-foreground hover:opacity-90"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Searching & generating...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="h-4 w-4" />
+                        {t("findSchemes")}
+                      </>
+                    )}
+                  </Button>
+                </SignedIn>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <Button className="gap-2 bg-gradient-accent text-accent-foreground hover:opacity-90">
+                      <Search className="h-4 w-4" />
+                      {language === "hi" ? "पात्रता जांचने के लिए साइन इन करें" : "Sign in to check eligibility"}
+                    </Button>
+                  </SignInButton>
+                </SignedOut>
+              </>
             )}
           </div>
         </div>

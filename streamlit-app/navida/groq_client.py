@@ -16,7 +16,7 @@ load_dotenv(_base.parent / ".env")  # project root
 
 # Default model - fast and capable for explanations
 DEFAULT_MODEL = "llama-3.3-70b-versatile"
-MODEL_DISPLAY_NAME = "Llama 3.3 70B Versatile"
+MODEL_DISPLAY_NAME = "Llama-4-scout-17b-16e-instruct Versatile"
 
 
 def generate_guidance(user_profile: dict, exa_context: str, urls: list, language: str = "English") -> dict:

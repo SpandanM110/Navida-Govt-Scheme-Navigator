@@ -77,7 +77,7 @@ export function ContactSection() {
     },
   };
 
-  const t = content[language];
+  const t = content[language as keyof typeof content] || content.en;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
