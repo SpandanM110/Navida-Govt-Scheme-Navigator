@@ -14,7 +14,7 @@ export async function GET() {
       return NextResponse.json({ sessions: [] });
     }
     const { data, error } = await supabase
-      .from("chat_sessions" as any)
+      .from("chat_sessions")
       .select("id, title, scheme_context, created_at, updated_at")
       .eq("user_id", userId)
       .order("updated_at", { ascending: false })
@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Chat storage not configured" }, { status: 503 });
     }
     const { data, error } = await supabase
-      .from("chat_sessions" as any)
-      .insert({ user_id: userId, title, scheme_context })
+      .from("chat_sessions")
+      .insert({ user_id: userId, title, scheme_context } as never)
       .select("id, title, created_at")
       .single();
 

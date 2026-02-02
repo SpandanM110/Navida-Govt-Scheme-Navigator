@@ -3,13 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { AuthSignedIn, AuthSignedOut } from "@/components/AuthGuard";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Globe, Menu, X, ChevronDown } from "lucide-react";
@@ -133,7 +128,22 @@ export function Header() {
         {/* Right Actions */}
         <div className="flex items-center gap-3">
           {/* Auth */}
-          <SignedOut>
+          <AuthSignedOut
+            fallback={
+              <>
+                <Link href="/sign-in">
+                  <Button variant="ghost" size="sm">
+                    {language === "hi" ? "साइन इन" : "Sign In"}
+                  </Button>
+                </Link>
+                <Link href="/sign-up">
+                  <Button size="sm" className="bg-primary text-primary-foreground">
+                    {language === "hi" ? "साइन अप" : "Sign Up"}
+                  </Button>
+                </Link>
+              </>
+            }
+          >
             <SignInButton mode="modal">
               <Button variant="ghost" size="sm">
                 {language === "hi" ? "साइन इन" : "Sign In"}
@@ -144,10 +154,10 @@ export function Header() {
                 {language === "hi" ? "साइन अप" : "Sign Up"}
               </Button>
             </SignUpButton>
-          </SignedOut>
-          <SignedIn>
+          </AuthSignedOut>
+          <AuthSignedIn>
             <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+          </AuthSignedIn>
           {/* Language Switcher - Multilingual support */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

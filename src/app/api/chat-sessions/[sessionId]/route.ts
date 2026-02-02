@@ -19,7 +19,7 @@ export async function GET(
     }
 
     const { data: session, error: sessionError } = await supabase
-      .from("chat_sessions" as any)
+      .from("chat_sessions")
       .select("id, title, scheme_context, created_at")
       .eq("id", sessionId)
       .eq("user_id", userId)
@@ -30,7 +30,7 @@ export async function GET(
     }
 
     const { data: messages, error: messagesError } = await supabase
-      .from("chat_messages" as any)
+      .from("chat_messages")
       .select("id, role, content, created_at")
       .eq("session_id", sessionId)
       .order("created_at", { ascending: true });
@@ -42,7 +42,10 @@ export async function GET(
 
     return NextResponse.json({
       session,
-      messages: (messages || []).map((m) => ({ role: m.role, content: m.content })),
+      messages: (messages || []).map((m: { role: string; content: string }) => ({
+        role: m.role,
+        content: m.content,
+      })),
     });
   } catch (err) {
     console.error("Chat session get error:", err);

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { schemes, states } from "@/lib/schemes";
@@ -81,11 +82,13 @@ export function Hero({ onStartCheck }: HeroProps) {
     <section className="relative overflow-hidden min-h-[90vh] flex items-center">
       {/* HD Background Image with Overlay */}
       <div className="absolute inset-0">
-        <img
+        <Image
           src="/images/hero-bg.jpg"
           alt=""
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
           aria-hidden="true"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />

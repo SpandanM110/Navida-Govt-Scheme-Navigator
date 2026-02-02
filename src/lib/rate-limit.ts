@@ -11,6 +11,8 @@ export interface RateLimitResult {
   error?: string;
 }
 
+type RateLimitRow = { window_start: string; ask_count: number };
+
 export async function checkAndIncrementRateLimit(
   userId: string,
   email: string
@@ -24,7 +26,7 @@ export async function checkAndIncrementRateLimit(
     const windowStart = new Date(now.getTime() - WINDOW_HOURS * 60 * 60 * 1000);
 
     const { data: existing, error: fetchError } = await supabase
-      .from("rate_limits" as any)
+      .from("rate_limits")
       .select("*")
       .eq("user_id", userId)
       .single();
@@ -34,13 +36,14 @@ export async function checkAndIncrementRateLimit(
       return { allowed: false, remaining: 0, resetAt: null, error: "Rate limit check failed" };
     }
 
-    const windowStartDate = existing?.window_start
-      ? new Date(existing.window_start)
+    const row = existing as RateLimitRow | null;
+    const windowStartDate = row?.window_start
+      ? new Date(row.window_start)
       : null;
     const isWindowExpired = windowStartDate
       ? windowStartDate < windowStart
       : true;
-    const currentCount = isWindowExpired ? 0 : (existing?.ask_count ?? 0);
+    const currentCount = isWindowExpired ? 0 : (row?.ask_count ?? 0);
 
     if (currentCount >= ASK_LIMIT) {
       const resetAt = windowStartDate
@@ -53,14 +56,14 @@ export async function checkAndIncrementRateLimit(
       };
     }
 
-    if (existing) {
+    if (row) {
       const { error: updateError } = await supabase
-        .from("rate_limits" as any)
+        .from("rate_limits")
         .update({
           ask_count: isWindowExpired ? 1 : currentCount + 1,
-          window_start: isWindowExpired ? now.toISOString() : existing.window_start,
+          window_start: isWindowExpired ? now.toISOString() : row.window_start,
           updated_at: now.toISOString(),
-        })
+        } as never)
         .eq("user_id", userId);
       if (updateError) {
         console.error("Rate limit update error:", updateError);
@@ -68,13 +71,13 @@ export async function checkAndIncrementRateLimit(
       }
     } else {
       const { error: insertError } = await supabase
-        .from("rate_limits" as any)
+        .from("rate_limits")
         .insert({
           user_id: userId,
           email,
           ask_count: 1,
           window_start: now.toISOString(),
-        });
+        } as never);
       if (insertError) {
         console.error("Rate limit insert error:", insertError);
         return { allowed: false, remaining: 0, resetAt: null };

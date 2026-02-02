@@ -26,7 +26,7 @@ export async function POST(
     }
 
     const { data: session } = await supabase
-      .from("chat_sessions" as any)
+      .from("chat_sessions")
       .select("id")
       .eq("id", sessionId)
       .eq("user_id", userId)
@@ -37,8 +37,8 @@ export async function POST(
     }
 
     const { data: message, error } = await supabase
-      .from("chat_messages" as any)
-      .insert({ session_id: sessionId, role, content })
+      .from("chat_messages")
+      .insert({ session_id: sessionId, role, content } as never)
       .select("id, role, content, created_at")
       .single();
 
@@ -48,8 +48,8 @@ export async function POST(
     }
 
     await supabase
-      .from("chat_sessions" as any)
-      .update({ updated_at: new Date().toISOString() })
+      .from("chat_sessions")
+      .update({ updated_at: new Date().toISOString() } as never)
       .eq("id", sessionId);
 
     return NextResponse.json({ message });

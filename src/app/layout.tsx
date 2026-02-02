@@ -9,18 +9,20 @@ export const metadata: Metadata = {
     "AI-powered platform to help Indian citizens discover, understand, and access government welfare schemes.",
 };
 
+const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+const hasClerk = clerkKey && !clerkKey.startsWith("YOUR_");
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <ClerkProvider>
-      <html lang="en">
-        <body>
-          <Providers>{children}</Providers>
-        </body>
-      </html>
-    </ClerkProvider>
+  const content = (
+    <html lang="en">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
   );
+  return hasClerk ? <ClerkProvider>{content}</ClerkProvider> : content;
 }

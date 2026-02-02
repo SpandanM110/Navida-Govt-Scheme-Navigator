@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import Link from "next/link";
+import { SignInButton } from "@clerk/nextjs";
+import { AuthSignedIn, AuthSignedOut } from "@/components/AuthGuard";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -327,7 +329,7 @@ export function EligibilityChecker({ onResults, onBack }: EligibilityCheckerProp
               </Button>
             ) : (
               <>
-                <SignedIn>
+                <AuthSignedIn>
                   <Button
                     onClick={handleSubmit}
                     disabled={!isStepValid() || loading}
@@ -345,15 +347,24 @@ export function EligibilityChecker({ onResults, onBack }: EligibilityCheckerProp
                       </>
                     )}
                   </Button>
-                </SignedIn>
-                <SignedOut>
+                </AuthSignedIn>
+                <AuthSignedOut
+                  fallback={
+                    <Link href="/sign-in">
+                      <Button className="gap-2 bg-gradient-accent text-accent-foreground hover:opacity-90">
+                        <Search className="h-4 w-4" />
+                        {language === "hi" ? "पात्रता जांचने के लिए साइन इन करें" : "Sign in to check eligibility"}
+                      </Button>
+                    </Link>
+                  }
+                >
                   <SignInButton mode="modal">
                     <Button className="gap-2 bg-gradient-accent text-accent-foreground hover:opacity-90">
                       <Search className="h-4 w-4" />
                       {language === "hi" ? "पात्रता जांचने के लिए साइन इन करें" : "Sign in to check eligibility"}
                     </Button>
                   </SignInButton>
-                </SignedOut>
+                </AuthSignedOut>
               </>
             )}
           </div>

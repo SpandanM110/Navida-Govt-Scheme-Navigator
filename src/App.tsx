@@ -4,12 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/context/LanguageContext";
-import Index from "./pages/Index";
-import About from "./pages/About";
-import Schemes from "./pages/Schemes";
-import FAQ from "./pages/FAQ";
-import Contact from "./pages/Contact";
-import NotFound from "./pages/NotFound";
+import Index from "./pages-vite/Index";
+import About from "./pages-vite/About";
+import Schemes from "./pages-vite/Schemes";
+import FAQ from "./pages-vite/FAQ";
+import Contact from "./pages-vite/Contact";
+import NotFound from "./pages-vite/NotFound";
 
 const queryClient = new QueryClient();
 
